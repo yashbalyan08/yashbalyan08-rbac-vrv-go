@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/yashbalyan08/rbac-vrv-go/config"
+	"github.com/yashbalyan08/rbac-vrv-go/routes"
+)
 
 func main() {
-	fmt.Println("esc")
+	config.InitDB()
+	defer config.DB.Close()
+
+	router := gin.Default()
+	routes.InitRoutes(router)
+
+	router.Run(":8080")
 }
