@@ -6,18 +6,28 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 )
 
 var DB *gorm.DB
 
-func initDB() {
+func InitDB() {
 	var err error
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"), os.Getenv("DB_PORT"))
+	// Environment variables for database connection
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+
+	// PostgreSQL connection string
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	fmt.Println(dsn)
+
 	DB, err = gorm.Open("postgres", dsn)
 	if err != nil {
-		log.Fatal("Error: ", err)
+		log.Fatalf("Error connecting to database: %v", err)
 	}
-	log.Println("DB connected: ", DB)
+	log.Println("Database connected successfully")
 }
