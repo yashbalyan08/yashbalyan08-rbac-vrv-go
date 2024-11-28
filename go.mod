@@ -9,6 +9,8 @@ require (
 	golang.org/x/crypto v0.29.0
 )
 
+require github.com/joho/godotenv v1.5.1
+
 require (
 	github.com/bytedance/sonic v1.12.5 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
