@@ -4,7 +4,7 @@ services:
     image: postgres:latest
     container_name: postgres_container
     ports:
-      - "5432"
+      - "5432:18012"
     environment:
       POSTGRES_USER: yashbalyan
       POSTGRES_PASSWORD: your_password
