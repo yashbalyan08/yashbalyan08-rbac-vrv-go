@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -13,6 +14,7 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Connecting to DB...")
+		log.Fatal("Error", err)
 	}
 	config.InitDB()
 	defer config.DB.Close()
