@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -15,6 +16,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// GenerateJWT generates a JWT token with username and role
 func GenerateJWT(username, role string) (string, error) {
 	claims := &Claims{
 		Username: username,
@@ -27,7 +29,9 @@ func GenerateJWT(username, role string) (string, error) {
 	return token.SignedString(jwtKey)
 }
 
+// ParseJWT parses and validates a JWT token
 func ParseJWT(tokenString string) (*Claims, error) {
+	log.Println("JWT: ", string(jwtKey))
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil

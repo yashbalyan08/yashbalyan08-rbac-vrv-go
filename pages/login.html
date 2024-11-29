@@ -5,8 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+
     <div class="container">
         <h2>Login</h2>
         <form id="loginForm">
@@ -18,26 +74,55 @@
 
             <button type="button" onclick="submitLogin()">Login</button>
         </form>
+        <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script>
         async function submitLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
+            // Clear any previous error messages
+            errorMessage.textContent = '';
 
-            const data = await response.json();
-            if (response.ok) {
-                window.location.href = "/logged-in";
-            } else {
-                alert('Error: ' + data.error);
+            // Validate inputs
+            if (!username || !password) {
+                errorMessage.textContent = 'Please fill out both fields.';
+                return;
+            }
+
+            try {
+                // Make a POST request to login endpoint
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization':'Beaer ${token}',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                // Get response data
+                const data = await response.json();
+
+                // Check if login was successful
+                if (response.ok) {
+                    // Store the JWT token in localStorage
+                    localStorage.setItem('jwt', data.token);
+
+                    // Redirect to logged-in page
+                    window.location.href = '/logged-in';
+                } else {
+                    // Show the error message returned from the server
+                    errorMessage.textContent = data.error || 'Login failed. Please try again.';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred. Please try again later.';
+                console.error('Error:', error);
             }
         }
     </script>
+
 </body>
 </html>

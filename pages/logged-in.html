@@ -12,16 +12,22 @@
         <p>You are now logged in.</p>
         
         <!-- Logout Button -->
-        <button id="logoutButton" onclick="logout()">Logout</button>
-    </div>
-
+        <button id="logoutBtn">Logout</button>
     <script>
-        function logout() {
-            // Clear token from localStorage (or sessionStorage)
-            localStorage.removeItem('authToken');
-            // Redirect to the login page
-            window.location.href = "/login"; // Redirect to your appropriate login page
-        }
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            fetch("/logout", {
+            method: "POST",
+                credentials: "include" // Ensures cookies are sent with the request
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "Logged out successfully") {
+                alert("You have been logged out.");
+                window.location.href = "/login"; // Redirect to login page
+            }
+        });
+    });
     </script>
+
 </body>
 </html>

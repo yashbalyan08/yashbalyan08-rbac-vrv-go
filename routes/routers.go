@@ -9,31 +9,31 @@ import (
 )
 
 func InitRoutes(router *gin.Engine) {
-	// Route for login page
+	// Login and Register routes
 	router.GET("/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", nil)
 	})
-
-	// Route for register page
-	router.GET("/register", func(c *gin.Context) {
+	router.GET("/register", middleware.AuthMiddleware(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", nil)
 	})
+	router.POST("/register", controllers.Register)
+	router.POST("/login", controllers.Login)
 
-	// Route for logged-in page
-	router.GET("/logged-in", func(c *gin.Context) {
+	// Profile route (requires authentication)
+	router.GET("/profile", middleware.AuthMiddleware(), middleware.AuthorizeRoles([]string{"User"}), func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "User profile data"})
+	})
+
+	// Dashboard route (requires authentication)
+	router.GET("/dashboard", middleware.AuthMiddleware(), middleware.AuthorizeRoles([]string{"Admin"}), func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Dashboard for authenticated users"})
+	})
+
+	// Logged-in route
+	router.GET("/logged-in", middleware.AuthMiddleware(), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "logged-in.html", nil)
 	})
 
-	// Route for registering a new user
-	router.POST("/register", controllers.Register)
+	router.POST("/logout", controllers.Logout)
 
-	// Route for user login
-	router.POST("/login", controllers.Login)
-
-	// Protected admin routes
-	protected := router.Group("/admin")
-	protected.Use(middleware.Authorize("Admin"))
-	protected.GET("/dashboard", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Welcome to Admin Dashboard"})
-	})
 }
