@@ -25,5 +25,5 @@ func main() {
 	router.LoadHTMLGlob("pages/*")
 	routes.InitRoutes(router)
 
-	router.Run(":10000")
+	router.Run(":8080")
 }
