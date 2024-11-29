@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
@@ -14,7 +13,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the Authorization header
 		authHeader, _ := c.Cookie("auth_token")
-		log.Println("Header: ", authHeader)
+		//intln("Header: ", authHeader)
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
@@ -22,7 +21,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		// Extract the token and validate it
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		log.Println(tokenString)
+		//log.Println(tokenString)
 		_, err := utils.ParseJWT(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -39,11 +38,9 @@ func AuthMiddleware() gin.HandlerFunc {
 func AuthorizeRoles(allowedRoles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the Authorization header
-		t, err := c.Cookie("auth_token")
-		log.Println(t)
-		authHeader := c.GetHeader("Authorization")
+		authHeader, _ := c.Cookie("auth_token")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
 		}
