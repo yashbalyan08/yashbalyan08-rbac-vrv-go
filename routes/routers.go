@@ -30,7 +30,7 @@ func InitRoutes(router *gin.Engine) {
 	})
 
 	// Logged-in route
-	router.GET("/logged-in", middleware.AuthMiddleware(), func(c *gin.Context) {
+	router.GET("/logged-in", middleware.AuthMiddleware(), middleware.AuthorizeRoles([]string{"User", "Admin"}), func(c *gin.Context) {
 		c.HTML(http.StatusOK, "logged-in.html", nil)
 	})
 
