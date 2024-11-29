@@ -20,7 +20,7 @@ func main() {
 	defer config.DB.Close()
 
 	router := gin.Default()
-	router.Static("/static", "./static")
+	//router.Static("/static", "./static")
 
 	router.LoadHTMLGlob("pages/*")
 	routes.InitRoutes(router)

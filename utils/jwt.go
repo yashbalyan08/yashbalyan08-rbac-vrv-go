@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"log"
 	"os"
 	"time"
@@ -41,4 +43,16 @@ func ParseJWT(tokenString string) (*Claims, error) {
 		return nil, err
 	}
 	return claims, nil
+}
+
+func GenerateCSRFToken() string {
+	// Create a random 32-byte token.
+	token := make([]byte, 32)
+	_, err := rand.Read(token)
+	if err != nil {
+		log.Fatalf("Error generating CSRF token: %v", err)
+	}
+
+	// Return the token as a base64-encoded string
+	return base64.URLEncoding.EncodeToString(token)
 }

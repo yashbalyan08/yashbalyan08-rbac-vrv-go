@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logged In</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    
 </head>
 <body>
     <div class="container">
@@ -13,20 +13,36 @@
         
         <!-- Logout Button -->
         <button id="logoutBtn">Logout</button>
+    </div>
+
     <script>
         document.getElementById("logoutBtn").addEventListener("click", () => {
             fetch("/logout", {
-            method: "POST",
-                credentials: "include" // Ensures cookies are sent with the request
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === "Logged out successfully") {
-                alert("You have been logged out.");
-                window.location.href = "/login"; // Redirect to login page
-            }
+                method: "POST",
+                credentials: "include", // Ensures cookies are sent with the request
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`, // Send Bearer token
+                    'X-CSRF-Token': localStorage.getItem('csrf-token') // Send CSRF token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Logged out successfully") {
+                    // Clear tokens from localStorage
+                    localStorage.removeItem('jwt');
+                    localStorage.removeItem('csrf-token');
+                    
+                    alert("You have been logged out.");
+                    window.location.href = "/login"; // Redirect to login page
+                } else {
+                    alert("Logout failed. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error during logout:", error);
+                alert("An error occurred. Please try again.");
+            });
         });
-    });
     </script>
 
 </body>

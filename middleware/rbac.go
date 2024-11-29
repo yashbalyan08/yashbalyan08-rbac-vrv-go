@@ -13,8 +13,8 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the Authorization header
-		authHeader := c.GetHeader("Authorization")
-		log.Println("Header", authHeader)
+		authHeader, _ := c.Cookie("auth_token")
+		log.Println("Header: ", authHeader)
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
@@ -39,6 +39,8 @@ func AuthMiddleware() gin.HandlerFunc {
 func AuthorizeRoles(allowedRoles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the Authorization header
+		t, err := c.Cookie("auth_token")
+		log.Println(t)
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

@@ -83,32 +83,47 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Set the JWT token as an HTTP-only cookie
+	// Generate CSRF token (you can use a custom function here if needed)
+	csrfToken := utils.GenerateCSRFToken()
 	c.SetCookie(
-		"auth_token", // Cookie name
-		token,        // Token value
-		3600,         // Max age in seconds (e.g., 3600 = 1 hour)
-		"/",          // Path
-		"",           // Domain (leave empty for default)
-		false,        // Secure (set to true in production for HTTPS)
-		true,         // HttpOnly (prevents access via JavaScript)
+		"auth_token",
+		"Bearer "+token,
+		3600*24,
+		"",
+		"",
+		false,
+		true,
 	)
-
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
+	c.SetCookie(
+		"csrf_token",
+		csrfToken,
+		3600*24,
+		"",
+		"",
+		false,
+		true,
+	)
+	// Send the token and CSRF token in the response body for frontend usage
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Login successful",
+		"jwt_token":  token,
+		"csrf_token": csrfToken,
+	})
 }
 
+// Logout handles user logout and token invalidation
 func Logout(c *gin.Context) {
-	// Set the auth_token cookie with a max age of -1 to delete it
-	c.SetCookie(
-		"auth_token", // Cookie name
-		"",           // Empty value
-		-1,           // Max age set to -1 to delete the cookie
-		"/",          // Path
-		"",           // Domain (leave empty for default)
-		false,        // Secure (set to true in production for HTTPS)
-		true,         // HttpOnly
-	)
+	// Invalidate the JWT token (if using cookies)
+	c.SetCookie("auth_token", "", -1, "", "", false, true) // Set cookie expiration to -1 to clear it
 
-	// Respond with a success message
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+	// Invalidate CSRF token
+	c.SetCookie("csrf_token", "", -1, "", "", false, true) // Set cookie expiration to -1 to clear it
+
+	// Optionally, remove the tokens from headers (if needed)
+	// c.Header("Authorization", "")
+
+	// Return a success message
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Logged out successfully",
+	})
 }
